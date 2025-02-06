@@ -7,6 +7,7 @@ import { logging } from "../../logging";
 
 //function som hanterar login
 export async function AuthLogin(username: string, password: string) {
+    logging(`searching for username: ${username}`);
   try {
     const found = await User.findOne({ username: username, password: password })
     if (!found) {
