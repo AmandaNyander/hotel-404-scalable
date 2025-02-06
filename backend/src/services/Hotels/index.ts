@@ -29,6 +29,6 @@ app.use((req, _, next) => {
   next(); 
 }); 
 
-app.listen(7701, () => {
+app.listen(7702, () => {
   logging("User service listening on port 7702"); 
 })
