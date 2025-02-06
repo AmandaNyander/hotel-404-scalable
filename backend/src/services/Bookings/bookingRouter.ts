@@ -1,7 +1,7 @@
-import { deleteBooking, createBooking, getBookingForUser } from "../controllers/bookingController";
-import { authenticateJWT } from "../controllers/auth";
+import { deleteBooking, createBooking, getBookingForUser } from "../../controllers/bookingController";
+import { authenticateJWT } from "../../controllers/auth";
 import express from 'express';
-import { logging } from "../logging";
+import { logging } from "../../logging";
 const bookingRouter = express.Router();
 // Route to create a booking with JWT authentication
 bookingRouter.post("/", authenticateJWT, async function(req, res){
