@@ -1,13 +1,16 @@
 
 import axios, {AxiosError} from 'axios';
 
-
+const URL_LOGIN = process.env.REACT_APP_API_URL_LOGIN;
+const URL_SIGNUP = process.env.REACT_APP_API_URL_SIGNUP;
+const URL_DELETE = process.env.REACT_APP_API_URL_DELETE;
+const URL_LOGOUT = process.env.REACT_APP_API_URL_LOGOUT;
 
 export async function VerifyUser (username: string, password:string): Promise<boolean | string>
 {
   try 
   {
-    const respone = await axios.post('http://localhost:7700/api/user/login', {
+    const respone = await axios.post(`${URL_LOGIN}`, {
       username: username,
       password: password
     });
@@ -29,7 +32,7 @@ export async function CreateUser (name:string, lastname:string, username:string,
 {
   try 
   {
-    const respone = await axios.post('http://localhost:7700/api/user/signup',{
+    const respone = await axios.post(`${URL_SIGNUP}`,{
       username: username,
       password: password,
       name: name,
@@ -48,7 +51,7 @@ export async function CreateUser (name:string, lastname:string, username:string,
 export async function DeleteUser(username: string) {
   try {
     console.log(username); 
-    const response = await axios.delete('http://localhost:7700/api/user/deleteme', {
+    const response = await axios.delete(`${URL_DELETE}`, {
       data: {username: username}
     });
     console.log("Deletion of user successful", response.data);
@@ -61,7 +64,7 @@ export async function DeleteUser(username: string) {
 
 export async function LogOut() {
   try {
-    const response = await axios.get('http://localhost:7700/api/user/logout');
+    const response = await axios.get(`${URL_LOGOUT}`);
     console.log("Logout successful");
     return true;
   } catch (error) {

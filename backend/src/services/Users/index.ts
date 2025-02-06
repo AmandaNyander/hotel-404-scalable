@@ -26,7 +26,7 @@ mongoose.connect(mongoURI)
 app.use("/", userRouter); 
 
 app.use((req, _, next) => {
-  logging(`Endpoint: ${req.path}, method: ${req.method}`); 
+  logging(`Endpoint: ${req.path}, method: ${req.method}`);
   next(); 
 }); 
 
