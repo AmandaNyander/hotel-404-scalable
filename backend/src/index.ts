@@ -51,6 +51,8 @@ app.use(session({
   }
 }));
 
+
+axios.defaults.withCredentials = true; 
 const mongoURI: string = process.env.DB_CONNECTION_STRING as string;
 
 
