@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/index.ts",
-    "user": "nodemon ./src/services/Users/index.ts"
+    "user": "npx tsx ./src/services/Users/index.ts"
   },
   "keywords": [],
   "author": "",

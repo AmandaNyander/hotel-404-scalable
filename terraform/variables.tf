@@ -7,3 +7,7 @@ variable app_name {
 variable location {
   default = "westeurope"
 }
+
+variable "kubernetes_version" {
+  default = "1.28.0"
+}

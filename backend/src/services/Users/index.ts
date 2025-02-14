@@ -31,6 +31,6 @@ app.use((req, _, next) => {
 }); 
 
 app.listen(7701, () => {
-  logging("User service listening on port 7701"); 
+  logging("User service is listening on port 7701"); 
 })
 
