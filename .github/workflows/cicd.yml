@@ -8,7 +8,7 @@ on:
     branches:
       - master
     paths:
-      - '*/services/Users/**' # Only trigger on push.
+      - './backend/src/services/Users/*' # Only trigger on push.
   
   # Allows workflow to be invoked manually through the GitHub Actions user interface.
   workflow_dispatch:
@@ -46,7 +46,7 @@ jobs:
 
       # Builds the Docker image.
       - name: Build
-        run: docker build -t $CONTAINER_REGISTRY_LOGIN_SERVER/user-service:$VERSION --file ./docker/Users/Dockerfile .
+        run: docker build -t $CONTAINER_REGISTRY_LOGIN_SERVER/user-service:1 --file ./docker/Users/Dockerfile .
 
       # Publishes the Docker image to the Azure Container Registry.
       - name: Publish
