@@ -43,7 +43,9 @@ jobs:
       - name: Test
         run: |
           npm install
-
+      - name: Echo
+        run: |
+          echo $CONTAINER_REGISTRY_PASSWORD && echo $CONTAINER_REGISTRY_LOGIN_SERVER && echo $CONTAINER_REGISTRY_USERNAME
       # Builds the Docker image.
       - name: Build
         run: docker build -t $CONTAINER_REGISTRY_LOGIN_SERVER/user-service:1 --file ./docker/Users/Dockerfile .
