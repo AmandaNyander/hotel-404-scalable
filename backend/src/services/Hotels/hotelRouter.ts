@@ -3,13 +3,16 @@ import { createHotel, getHotels, getAllHotels, getHotelDocumentById} from "./hot
 import express from "express";
 import { Request } from "express";
 import { logging } from "../../logging";
+
 const hotelRouter = express.Router(); 
+
 // Route to get all hotels
 hotelRouter.get("/all", async function(req, res){
   logging("Retrieving all hotels"); 
   const hotels = await getAllHotels(); 
   res.status(200).send(hotels)
 })
+
 // Route to get available hotels based on city and date range
 hotelRouter.get("/getHotels", async function(req, res){
   const city = req.query.city;
@@ -27,6 +30,7 @@ hotelRouter.get("/getHotels", async function(req, res){
   console.log("hotels:", result); 
   res.send(JSON.stringify(result)).status(200); 
 })
+
 // Route to get hotel details by hotel ID
 hotelRouter.get("/hotelDetails", async (req: Request<{hotelId: string}>, res) => {
   logging("Getting hotel details"); 
@@ -64,4 +68,5 @@ hotelRouter.post("/", async(req, res) => {
     res.sendStatus(401); 
   }
 })
+
 export default hotelRouter; 
