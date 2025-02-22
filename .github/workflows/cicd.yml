@@ -40,6 +40,7 @@ jobs:
       - name: Test
         run: |
           npm install
+          npm test
       - name: Login to Azure CR 
         uses: azure/docker-login@v1
         with: 
