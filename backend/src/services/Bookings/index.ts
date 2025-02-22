@@ -34,3 +34,5 @@ app.use((req, _, next) => {
 app.listen(7703, () => {
   logging("Booking service listening on port 7703"); 
 })
+
+export default app;
