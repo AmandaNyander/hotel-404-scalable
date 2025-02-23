@@ -123,5 +123,27 @@ describe("Booking Service Tests", () => {
         })
     })
 
-    //
+    //Test för att ta bort bokningar
+    describe("Delete Booking", () => {
+        //Tar bort en bokning utan problem
+        it("Should dekete a booking without any problem", async () => {
+            const tempBookingID = "testBooking";
+            Booking.findByIdAndDelete= jest.fn().mockResolvedValue({id:tempBookingID})
+            await deleteBooking(tempBookingID);
+            expect(Booking.findByIdAndDelete).toHaveBeenCalledWith(tempBookingID);
+            expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
+
+        });
+
+        //Lyckas inte, bokningen finns inte
+        it("Should throw error, booking not found", async () => {
+            const tempBookingID= "TestBooking";
+            Booking.findByIdAndDelete= jest.fn().mockResolvedValue(null);
+            const res = deleteBooking(tempBookingID)
+            await expect(res).rejects.toThrow("Error 001: Booking not found");
+            expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
+        })
+
+        
+    })
 })
