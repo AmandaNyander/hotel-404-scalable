@@ -5,32 +5,20 @@ import cors from 'cors';
 import 'dotenv/config';
 import { logging } from '../../logging';
 import cookieParser from 'cookie-parser';
+import createServer from './server';
 
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-app.set("trust proxy", 1);
 
 const mongoURI: string = process.env.DB_CONNECTION_STRING as string;
+if (process.env.NODE_ENV !== "test") {
+  mongoose.connect(mongoURI)
+    .then(() => {
+      logging('User service connected to MongoDB Atlas');
+    })
+    .catch(err => {
+      logging(`MongoDB connection error: ${err}`);
+    });
+}
 
-mongoose.connect(mongoURI)
-  .then(() => {
-    logging('User service connected to MongoDB Atlas');
-  })
-  .catch(err => {
-    logging(`MongoDB connection error: ${err}`);
-  });
+const app = createServer(); 
 
-app.use("/", userRouter); 
-
-app.use((req, _, next) => {
-  logging(`Endpoint: ${req.path}, method: ${req.method}`);
-  next(); 
-}); 
-
-app.listen(7701, () => {
-  logging("User service is listening on port 7701"); 
-})
-
+export default app; 

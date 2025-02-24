@@ -2,6 +2,17 @@ import { AuthLogin, newUser, deleteUser } from "./userController";
 import { accessTokenSecret, authenticateJWT } from "../../controllers/auth";
 import jwt from "jsonwebtoken";
 import { logging } from "../../logging";
+import { Request } from "express";
+
+declare namespace Express {
+  export interface Request{
+    user?: string
+  }
+  export interface SessionData{
+    isLoggedIn: boolean, 
+    username: string
+  }
+}
 
 import express from "express";
 const userRouter = express.Router();
@@ -11,10 +22,13 @@ userRouter.post("/login", async function(req, res, next) {
   const username = req.body.username;
   const password = req.body.password;
   try {
+    logging("Auth user..."); 
     const validUser = await AuthLogin(username, password);
+    logging("Auth successful!"); 
     const accessToken = jwt.sign({ username: username }, accessTokenSecret, { expiresIn: "20m" });
     res.cookie('token', accessToken, { httpOnly: true });
     res.sendStatus(201);
+    logging(`${req.session}`)
     req.session.isLoggedIn = true;
     req.session.username = username;
     console.log(req.session.username);
@@ -40,9 +54,11 @@ userRouter.post("/signup", async function(req, res) {
     const createUser = await newUser(name, lastname, username, age, password, isAdmin);
     const accessToken = jwt.sign({ username: username }, accessTokenSecret, { expiresIn: "20m" });
     res.cookie('token', accessToken, { httpOnly: true });
-    res.json().status(201).send();
+    logging("Sending status 201"); 
+    res.sendStatus(201);
   }
-  catch {
+  catch (err){
+    console.log(err); 
     res.sendStatus(400);
   }
 })
@@ -55,7 +71,7 @@ userRouter.delete("/deleteme", authenticateJWT, async function(req, res) {
   try {
     const userDelete = await deleteUser(userID);
     res.cookie("token", "none", { maxAge: 1 });
-    res.sendStatus(201);
+    res.sendStatus(204);
   }
   catch {
     res.sendStatus(400);

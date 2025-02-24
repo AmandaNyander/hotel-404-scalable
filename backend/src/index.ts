@@ -25,8 +25,12 @@ declare global {
       DB_CONNECTION_STRING: string;
     }
   }
+  namespace Express {
+    interface Request {
+      user?: string
+    }
+  }
 }
-
 
 const app = express();
 
