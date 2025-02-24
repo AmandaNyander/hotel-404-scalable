@@ -8,6 +8,7 @@ import { Hotel } from "../Hotels/Hotel";
 import { logging } from "../../logging";
 import exp from "constants";
 import { createCipheriv } from "crypto";
+import { hotelFreeBetweenDates } from "../Hotels/hotelController";
 
 //Fixar miljön för testerna
 process.env.NODE_ENV = "test";
@@ -42,7 +43,7 @@ jest.mock("../../logging",  () => ({
 //Mock av Hotel Model
 jest.mock("../Hotels/Hotel", () => ({
     Hotel: {
-        findById: jest.fn();
+        findById: jest.fn()
     },
 }))
 
@@ -144,6 +145,49 @@ describe("Booking Service Tests", () => {
             expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
         })
 
-        
+        //Error på DB
+        it("Should log an error if DB error occurs", async () => {
+            const tempBookingID= "TestBooking1";
+            const DB_Error= new Error("DB error");
+            Booking.findByIdAndDelete = jest.fn().mockRejectedValue(DB_Error);
+
+            await expect(deleteBooking(tempBookingID)).rejects.toThrow(DB_Error);
+            expect(logging).toHaveBeenCalledWith("Database error when retrieving booking");
+        });
+    });
+
+    //Test för att ta fram alla bokningar som en användare har
+    describe("Get All bookings for a user", ()=> {
+
+        //Tar fram alla bokningar utan problem
+        it("Should retrieve booking for the user", async () => {
+            const test_username = "Adam99";
+            const test_Bookings= [
+                { hotel:"hotel1", user: test_username, from_date:"2025-04-01", to_date: "2025-04-04", cost: 1000},
+               ];
+
+            const test_hotel= {display: {title: "Hotel Everywhere"}};
+            Hotel.findById = jest.fn().mockResolvedValue(test_hotel);
+            Booking.find = jest.fn().mockRejectedValue(test_Bookings);
+
+            const res = await getBookingForUser(test_username);
+
+            expect(Booking.find).toHaveBeenCalledWith({user:test_username});
+            expect(Hotel.findById).toHaveBeenCalledWith(test_Bookings[0].hotel);
+            expect(res).toEqual([
+                {
+                    id: expect.any(String),
+                    hotel: "Hotel Everywhere",
+                    user:test_username,
+                    from_date: "2025-04-01",
+                    to_date:"2024-04-04",
+                    cost: 1000
+
+                }
+            ])
+
+
+
+        })
     })
 })
