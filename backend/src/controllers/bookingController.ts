@@ -64,7 +64,7 @@ export async function createBooking(hotelID: string, user: string, from_date: st
 }
 // Function to retrieve bookings for a specific user
 export async function getBookingForUser(username: string) {
-  logging("Getting bookings for " || username); 
+  logging("Getting bookings for " + username); 
   console.log(username); 
   const bookings = await Booking.find({user: username});
   console.log(bookings);
@@ -73,14 +73,15 @@ export async function getBookingForUser(username: string) {
     console.log(booking); 
     const hotel = await Hotel.findById(booking.hotel);
     const formattedBooking = {
-      id: booking.id,
+      id: booking._id,
       hotel: hotel?.display?.title, 
       user: booking.user, 
       to_date: booking.to_date.split("T")[0], 
       from_date: booking.from_date.split("T")[0], 
       cost: booking.cost
     }; 
-    formattedBookings.push(formattedBooking); 
+    formattedBookings.push(formattedBooking);
+    console.log(formattedBookings); 
   }
   return formattedBookings; 
 }

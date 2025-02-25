@@ -71,9 +71,10 @@ export async function getBookingForUser(username: string) {
   var formattedBookings = []
   for(let booking of bookings) {
     console.log(booking); 
+    console.log(booking._id); 
     const hotel = await Hotel.findById(booking.hotel);
     const formattedBooking = {
-      id: booking.id,
+      id: booking._id,
       hotel: hotel?.display?.title, 
       user: booking.user, 
       to_date: booking.to_date.split("T")[0], 
