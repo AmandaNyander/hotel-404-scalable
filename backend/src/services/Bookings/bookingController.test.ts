@@ -50,6 +50,7 @@ jest.mock("../Hotels/Hotel", () => ({
 //Mock av Booking Model
 jest.mock("./Booking", () => ({
     Booking: {
+        findById:jest.fn(),
         findByIdAndDelete:jest.fn(),
         create: jest.fn(),
         find:jest.fn()
@@ -85,7 +86,7 @@ describe("Booking Service Tests", () => {
                 to_date: "2025-05-01",
                 cost: Mockcost,
             });
-            expect(logging).toHaveBeenCalledWith(`Creating booking at hotel ${hotelID} for user ${user}`);
+            expect(logging).toHaveBeenCalledWith(`Creating booking for user ${user} for hotel ${hotelID}`);
             
         })
         //Testar att boka ett hotel som inte ens finns
@@ -116,8 +117,10 @@ describe("Booking Service Tests", () => {
         it("Should throw an error for invalid dates, to short period", async () => {
             const hotelID = "hotel123";
             const user = "user123";
-            const from_date= "2025-04-01";
+            const from_date= "2025-04-05";
             const to_date ="2025-04-01";
+            const Mockhotel = {display : {price:1}};
+            Hotel.findById = jest.fn().mockResolvedValue(Mockhotel);
 
             const error = createBooking(hotelID, user, from_date,to_date);
             await expect(error).rejects.toThrow("invalid dates")
@@ -127,7 +130,7 @@ describe("Booking Service Tests", () => {
     //Test för att ta bort bokningar
     describe("Delete Booking", () => {
         //Tar bort en bokning utan problem
-        it("Should dekete a booking without any problem", async () => {
+        it("Should delete a booking without any problem", async () => {
             const tempBookingID = "testBooking";
             Booking.findByIdAndDelete= jest.fn().mockResolvedValue({id:tempBookingID})
             await deleteBooking(tempBookingID);
@@ -163,12 +166,12 @@ describe("Booking Service Tests", () => {
         it("Should retrieve booking for the user", async () => {
             const test_username = "Adam99";
             const test_Bookings= [
-                { hotel:"hotel1", user: test_username, from_date:"2025-04-01", to_date: "2025-04-04", cost: 1000},
+                { _id: "1234", hotel:"hotel1", user: test_username, from_date:"2025-04-01", to_date: "2025-04-04", cost: 1000},
                ];
 
             const test_hotel= {display: {title: "Hotel Everywhere"}};
             Hotel.findById = jest.fn().mockResolvedValue(test_hotel);
-            Booking.find = jest.fn().mockRejectedValue(test_Bookings);
+            Booking.find = jest.fn().mockResolvedValue(test_Bookings);
 
             const res = await getBookingForUser(test_username);
 
@@ -176,18 +179,15 @@ describe("Booking Service Tests", () => {
             expect(Hotel.findById).toHaveBeenCalledWith(test_Bookings[0].hotel);
             expect(res).toEqual([
                 {
-                    id: expect.any(String),
+                    id: expect.any(String), // booking.id
                     hotel: "Hotel Everywhere",
                     user:test_username,
                     from_date: "2025-04-01",
-                    to_date:"2024-04-04",
+                    to_date:"2025-04-04",
                     cost: 1000
 
                 }
             ])
-
-
-
         })
     })
 })

@@ -64,7 +64,7 @@ export async function createBooking(hotelID: string, user: string, from_date: st
 }
 // Function to retrieve bookings for a specific user
 export async function getBookingForUser(username: string) {
-  logging("Getting bookings for " || username); 
+  logging(`Getting bookings for ${username}` || username); 
   console.log(username); 
   const bookings = await Booking.find({user: username});
   console.log(bookings);
