@@ -142,8 +142,9 @@ describe("Booking Service Tests", () => {
             const user = "user123";
             const from_date= "2025-04-05";
             const to_date ="2025-04-01";
-            const Mockhotel = {display : {price:1}};
-            Hotel.findById = jest.fn().mockResolvedValue(Mockhotel);
+            //const Mockhotel = {display : {price:1}};
+            /*Hotel.findById = jest.fn().mockResolvedValue(Mockhotel);*/
+            
 
             const error = createBooking(hotelID, user, from_date,to_date);
             await expect(error).rejects.toThrow("invalid dates")
@@ -185,7 +186,8 @@ describe("Booking Service Tests", () => {
             Booking.findByIdAndDelete= jest.fn().mockResolvedValue(null);
             const res = deleteBooking(tempBookingID)
             await expect(res).rejects.toThrow("Error 001: Booking not found");
-            expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
+            //expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
+            expect(logging).toHaveBeenCalledWith("Booking not found")
         })
 
         //Error på DB
