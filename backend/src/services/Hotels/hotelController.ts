@@ -32,7 +32,8 @@ export async function hotelFreeBetweenDates(hotel:any, fromDate: Date, toDate: D
   for(let booking of bookings){
     const bookingFromDate = new Date(booking.from_date);  
     const bookingToDate = new Date(booking.to_date);
-    if(fromDate <= bookingToDate && bookingFromDate >= fromDate){
+    if(!(toDate < bookingFromDate || fromDate > bookingToDate)){
+        //fromDate <= bookingToDate && bookingFromDate >= fromDate
       return false;
     }
   } 
