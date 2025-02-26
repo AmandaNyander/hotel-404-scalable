@@ -20,6 +20,10 @@ beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     await mongoose.connect(mongoServer.getUri(), {dbName:"TestDB"});
 });
+//För att rensa all logging innan varje test
+beforeEach(async () => {
+    jest.clearAllMocks();
+})
 
 //Tömma variabler efter varje test
 afterEach(async() => {
@@ -60,9 +64,16 @@ jest.mock("./Booking", () => ({
 
 //Skapar Huvud testen som innehåller alla testerna som har med Booking Service att göra
 describe("Booking Service Tests", () => {
+    
+    //Skapar en mock DB för testerna
+    let MOCKDB_MT: any[];
 
+    //Ser till att den är tom innan varje test
+    beforeEach(() => {
+        MOCKDB_MT= [];
+    });
     //Test för att skapa en Bokning
-    describe("Create Booking", () => {
+    describe("Create Booking", () => { 
         //Test case 1, Att skapa en bokning med rätt information
         it("Should create a new booking success", async () => {
             const hotelID = "hotel123";
@@ -71,21 +82,33 @@ describe("Booking Service Tests", () => {
             const to_date ="2025-05-01";
             const Mockhotel = {display : {price:1}};
             const Mockcost = 30;
+            
             Hotel.findById = jest.fn().mockResolvedValue(Mockhotel);
-            Booking.create = jest.fn().mockResolvedValue({});
+            
+            Booking.create = jest.fn().mockImplementation((booking) => {
+                MOCKDB_MT.push(booking); //Lägger till en bokning i MOCK DB
+            });
+
+            //Ser till att DB är tom innan vi sätter igång 
+            expect(MOCKDB_MT.length).toBe(0);
 
             //Testar att skapa en den bokningen
             await createBooking(hotelID,user,from_date,to_date);
             //ska testa om hotellet hittas
             expect(Hotel.findById).toHaveBeenCalledWith(hotelID);
-            //Ska testa att skapa en bokning med dessa
-            expect(Booking.create).toHaveBeenCalledWith({
+            
+            //Dubbel kollar att en ny bokning har lagts till
+            expect(MOCKDB_MT.length).toBe(1);
+
+            //Kontrollerar att den nya bokningen har alla rätta uppgifterna 
+            expect(MOCKDB_MT[0]).toEqual({
                 hotel:hotelID,
                 user:user,
-                from_date: "2025-04-01",
-                to_date: "2025-05-01",
-                cost: Mockcost,
+                from_date:"2025-04-01",
+                to_date:"2025-05-01",
+                cost:Mockcost,
             });
+
             expect(logging).toHaveBeenCalledWith(`Creating booking for user ${user} for hotel ${hotelID}`);
             
         })
@@ -131,10 +154,27 @@ describe("Booking Service Tests", () => {
     describe("Delete Booking", () => {
         //Tar bort en bokning utan problem
         it("Should delete a booking without any problem", async () => {
+            //Definerar en mockDB i from av Array
+            let MOCKDB = [
+                {id: "testBooking", hotel:"hotelEveryWhere", user:"Adam", from_date:"2025-04-01", to_date:"2025-04-10", cost:1000},
+                {id: "testBooking2", hotel:"hotelNoWhere", user:"Max", from_date:"2025-04-20", to_date:"2025-04-25", cost: 2000}
+            ];
+
+            //Bokning som testet ska försöka ta bort
             const tempBookingID = "testBooking";
-            Booking.findByIdAndDelete= jest.fn().mockResolvedValue({id:tempBookingID})
+            //Kontrollerar att alla bokningar fortfarande finns med 
+            expect(MOCKDB.length).toBe(2);
+
+            //Kontrollerar att bokningen som vi ska testa på finns med
+            expect(MOCKDB.find(booking => booking.id === tempBookingID)).toBeDefined()
+
+            //Anropar deleteBooking funktionen för att ta bort bokningen
             await deleteBooking(tempBookingID);
-            expect(Booking.findByIdAndDelete).toHaveBeenCalledWith(tempBookingID);
+
+            //Dubbel kollar att bokningen faktiskt har tagits bort
+            expect(MOCKDB.length).toBe(1);//Endast en bokning kvar
+            expect(MOCKDB.find(booking=> booking.id ===tempBookingID)).toBeUndefined(); //Kontrollerar att ID för den bokningen inte längre finns med
+
             expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
 
         });
