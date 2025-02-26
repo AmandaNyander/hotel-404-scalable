@@ -180,6 +180,22 @@ describe("Booking Service Tests", () => {
 
         });
 
+        it("Should delete a booking without any problem (TEST AV AMADNA)", async () => {
+            const bookingToDelete = {_id: "booking1", hotel:"hotelEveryWhere", user:"Adam", from_date:"2025-04-01", to_date:"2025-04-10", cost:1000};
+            const bookingToKeep = {_id: "booking1", hotel:"hotelNoWhere", user:"Max", from_date:"2025-04-20", to_date:"2025-04-25", cost: 2000};
+            
+            (Booking.findByIdAndDelete as jest.Mock).mockImplementation(async (id) => {
+                if (id === "booking1") return bookingToDelete;
+                return null;
+            })
+
+            await deleteBooking("booking1");
+
+            expect(Booking.findByIdAndDelete).toHaveBeenCalledWith("booking1");
+            expect(Booking.findByIdAndDelete).not.toHaveBeenCalledWith("booking2");
+            expect(logging).toHaveBeenCalledWith("Deleting booking: booking1");
+        });
+
         //Lyckas inte, bokningen finns inte
         it("Should throw error, booking not found", async () => {
             const tempBookingID= "TestBooking";
