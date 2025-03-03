@@ -34,3 +34,30 @@ spec:
             cpu: 200m
             memory: 200Mi
 
+          ports:
+            -containerPort: 7701
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 7701
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 7701
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 7701
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 5
+

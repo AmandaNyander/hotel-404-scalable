@@ -7,6 +7,11 @@ import session from "express-session";
 function createServer() {
   const app = express();
 
+  app.get('./health', (req, res) => {
+    logging("Health check recieved");
+    res.status(200).send('OK');
+  })
+
   app.use(express.json());
   app.use(cookieParser());
   app.use(session({

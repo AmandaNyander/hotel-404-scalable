@@ -31,20 +31,24 @@ jest.mock("../../logging", () => ({
 
 let mongoServer: MongoMemoryServer | null = null
 
+//Creates a mock database
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     await mongoose.connect(mongoServer.getUri(), {dbName: "testDB"});
 })
 
+//Clears and restore all mocks before each test
 beforeEach(async () => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
 })
 
+//Drops the database after each test
 afterEach(async() => {
     await mongoose.connection.db?.dropDatabase();
 })
 
+//Disconnect and stops the database
 afterAll(async () => {
     if (mongoServer) {
         await mongoose.disconnect();
