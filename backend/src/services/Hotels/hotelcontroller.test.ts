@@ -10,6 +10,7 @@ import * as hotelController from "./hotelController";
 
 process.env.NODE_ENV = "test";
 
+// Mock hotel 
 jest.mock("./Hotel", () => ({
     Hotel: {
         find: jest.fn(),
@@ -19,32 +20,38 @@ jest.mock("./Hotel", () => ({
     }
 }))
 
+//Mock booking function
 jest.mock("../Bookings/Booking", () => ({
     Booking: {
         find: jest.fn()
     }
 }))
 
+//Mock logging
 jest.mock("../../logging", () => ({
     logging: jest.fn()
 }))
 
 let mongoServer: MongoMemoryServer | null = null
 
+//Runs before all tests, starts the mock database
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     await mongoose.connect(mongoServer.getUri(), {dbName: "testDB"});
 })
 
+//Runs before each test, clears and restore all mocks
 beforeEach(async () => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
 })
 
+//Runs after each test
 afterEach(async() => {
     await mongoose.connection.db?.dropDatabase();
 })
 
+//Runs after all tests, stops the mock database
 afterAll(async () => {
     if (mongoServer) {
         await mongoose.disconnect();
@@ -52,6 +59,7 @@ afterAll(async () => {
     }
 })
 
+//Test for createHotel, should create the hotel and find the hotel after creation.
 describe("Create hotel test", () => {
     it("Should create a hotel", async () => {
         const hotelID = "hotel123";
@@ -70,7 +78,9 @@ describe("Create hotel test", () => {
     })
 })
 
+//Tests for finding hotel by id
 describe("Find hotel tests by id", () => {
+    //This test successfully finds the hotel by its ID
     it("Should find hotel document by ID", async () => {
         const hotelID = "hotel123";
         const mockHotelData = {id: hotelID, title: "Hotellet", city: "Jönköping", price: 50};
@@ -83,6 +93,7 @@ describe("Find hotel tests by id", () => {
         expect(Hotel.findById).toHaveBeenCalledWith(hotelID);
     })
 
+    //This test should throw an error if the hotel is not found by ID
     it("Should throw an error if hotel is not found", async () => {
         const hotelID = "nonexciting";
 
@@ -92,6 +103,7 @@ describe("Find hotel tests by id", () => {
         expect(logging).toHaveBeenCalledWith("couldn't find hotel");
     })
 
+    //This test should throw an error if there is a database error
     it("Should throw an error if database error occurs", async () => {
         const hotelID = "hotel123";
         const mockError = new Error("Database error");
@@ -104,7 +116,9 @@ describe("Find hotel tests by id", () => {
 
 })
 
+//Tests for finding hotels by its name
 describe("Find hotel by name tests", () => {
+    //This test should successfully find a hotel by its name
     it("Should find hotel document by name", async () => {
         const hotelName = "Hotellet";
         const mockHotelData = {display:{ title: hotelName }, city: "Jönköping", price: 50};
@@ -117,6 +131,7 @@ describe("Find hotel by name tests", () => {
         expect(Hotel.findOne).toHaveBeenCalledWith({ 'display.title': hotelName });
     })
 
+    //This test should throw an error if the hotel is not found
     it("Should throw an error if hotel is not found", async () => {
         const hotelName = "nonexciting";
 
@@ -126,6 +141,7 @@ describe("Find hotel by name tests", () => {
         expect(logging).toHaveBeenCalledWith("Error retrieving hotel by Name: Error 002: Hotel not found");
     })
 
+    //This test should throw an error if a database error occurs
     it("Should throw an error if database error occurs", async () => {
         const hotelName = "Hotellet";
         const mockError = new Error("Database error");
@@ -137,7 +153,9 @@ describe("Find hotel by name tests", () => {
     })
 })
 
+//Tests for getAllHotels function
 describe("Get all hotels test", () => {
+    //This test should return all the hotels
     it("Should return all hotels", async () => {
         const mockHotels = [
             { display: { title: "Hotellet"}, city: "Staden"},
@@ -152,6 +170,7 @@ describe("Get all hotels test", () => {
         expect(logging).toHaveBeenCalledWith("Getting all hotels");
     })
 
+    //This test should not return any hotels at all when there is no hotels
     it("Should return empty array when no hotels are found", async () => {
         (Hotel.find as jest.Mock).mockResolvedValue([]);
 
@@ -162,7 +181,9 @@ describe("Get all hotels test", () => {
     })
 })
 
+//Tests for hotelFreeBetweenDates function
 describe("Hotel free between dates tests", () => {
+    //This test is checking the availability for a hotel, and returns true if it is availible
     it("Should return true if hotel is availible", async () => {
         const mockHotel = { _id: "hotel123"};
         const mockfrom_date = new Date("2025-04-01");
@@ -176,6 +197,7 @@ describe("Hotel free between dates tests", () => {
         expect(result).toBe(true);
     })
 
+    //This test is checking the availability for a hotel that is booked, and should return false
     it("Should return false if hotel is booked given dates", async () => {
         const mockHotel = { _id: "hotel123"};
         const mockfrom_date = new Date("2025-04-01");
@@ -189,6 +211,8 @@ describe("Hotel free between dates tests", () => {
         expect(result).toBe(false);
     })
 
+    //This test is checking the availability for a hotel that is booked, but should return true 
+    //because the hotel is free given dates
     it("Should return true if hotel is booked but not given dates", async () => {
         const mockHotel = { _id: "hotel123"};
         const mockfrom_date = new Date("2025-04-01");
@@ -203,8 +227,9 @@ describe("Hotel free between dates tests", () => {
     })
 })
 
+//Test for getHotels function
 describe("Get hotels test", () => {
-
+    //This test should return availible hotels when searching for a city
     it("Should return availible hotels when searching for a city", async () => {
         const mockHotels = [
             {_id: "hotel1", display: {city: "Staden"}},
@@ -223,6 +248,7 @@ describe("Get hotels test", () => {
         expect(logging).toHaveBeenCalledWith("Searching for hotels in city Staden between 2025-04-01 and 2025-04-05");
     })
 
+    //This test should return availible hotels when searching for a hotel but not specifying city
     it("Should return availble hotels when not searching for a city", async () => {
         const mockHotels = [
             {_id: "hotel3", display: {city: "Staden"}},
@@ -239,9 +265,8 @@ describe("Get hotels test", () => {
         expect(result).toEqual(mockHotels);
         expect(logging).toHaveBeenCalledWith("Searching for hotels  between 2025-04-01 and 2025-04-05");
     })
-})
 
-describe("Get hotels when one hotel is not availible test", () => { 
+    //This test should return the availble hotel5, hotel6 is booked and should not be returned
     it("Should only return free hotels (hotel6 is booked)", async () => {
         const mockHotels = [
             {_id: "hotel5", display: {city: "Staden"}},
@@ -261,3 +286,4 @@ describe("Get hotels when one hotel is not availible test", () => {
         expect(result).toEqual([{_id: "hotel5", display: {city: "Staden"}}]);
     })
 })
+
