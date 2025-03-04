@@ -153,36 +153,6 @@ describe("Booking Service Tests", () => {
 
     //Test för att ta bort bokningar
     describe("Delete Booking", () => {
-        //Tar bort en bokning utan problem
-        //Den funkar
-        /*
-        it("Should delete a booking without any problem", async () => {
-            //Definerar en mockDB i from av Array
-            let MOCKDB = [
-                {id: "testBooking", hotel:"hotelEveryWhere", user:"Adam", from_date:"2025-04-01", to_date:"2025-04-10", cost:1000},
-                {id: "testBooking2", hotel:"hotelNoWhere", user:"Max", from_date:"2025-04-20", to_date:"2025-04-25", cost: 2000}
-            ];
-
-            //Bokning som testet ska försöka ta bort
-            const tempBookingID = "testBooking";
-            //Kontrollerar att alla bokningar fortfarande finns med 
-            expect(MOCKDB.length).toBe(2);
-
-            //Kontrollerar att bokningen som vi ska testa på finns med
-            expect(MOCKDB.find(booking => booking.id === tempBookingID)).toBeDefined()
-
-            //Anropar deleteBooking funktionen för att ta bort bokningen
-            await deleteBooking(tempBookingID);
-
-            //Dubbel kollar att bokningen faktiskt har tagits bort
-            expect(MOCKDB.length).toBe(1);//Endast en bokning kvar
-            expect(MOCKDB.find(booking=> booking.id ===tempBookingID)).toBeUndefined(); //Kontrollerar att ID för den bokningen inte längre finns med
-
-            expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
-
-        });
-        */
-        //Den funkar
         
         it("Should delete a booking without any problem (TEST AV AMADNA)", async () => {
             const bookingToDelete = {_id: "booking1", hotel:"hotelEveryWhere", user:"Adam", from_date:"2025-04-01", to_date:"2025-04-10", cost:1000};
@@ -200,29 +170,20 @@ describe("Booking Service Tests", () => {
             expect(logging).toHaveBeenCalledWith("Deleting booking: booking1");
         });
 
-        //Lyckas inte, bokningen finns inte
-        //Den funkar inte
-        /*
+        //Testar att ta bort en bokning som inte finns i mockdatabasen
         it("Should throw error, booking not found", async () => {
-            const tempBookingID= "TestBooking";
-            Booking.findByIdAndDelete= jest.fn().mockResolvedValue(null);
-            const res = deleteBooking(tempBookingID)
-            await expect(res).rejects.toThrow("Error 001: Booking not found");
-            //expect(logging).toHaveBeenCalledWith(`Deleting booking: ${tempBookingID}`);
-            expect(logging).toHaveBeenCalledWith("Booking not found")
-        })*/
+            
+            //Mock för att ingenting ska hittas i mock DB
+            (Booking.findByIdAndDelete as jest.Mock).mockImplementation(() => Promise.resolve (null));
 
-        //Error på DB
-        //Den funkar inte
-        /*
-        it("Should log an error if DB error occurs", async () => {
-            const tempBookingID= "TestBooking1";
-            const DB_Error= new Error("DB error");
-            Booking.findByIdAndDelete = jest.fn().mockRejectedValue(DB_Error);
+            await expect(deleteBooking("booking123")).rejects.toThrow("Error 001: Booking not found");
 
-            await expect(deleteBooking(tempBookingID)).rejects.toThrow(DB_Error);
-            expect(logging).toHaveBeenCalledWith("Database error when retrieving booking");
-        }); */
+            expect(Booking.findByIdAndDelete).toHaveBeenCalledWith("booking123");
+
+            expect(logging).toHaveBeenCalledWith("Unable to find a booking with ID: booking123");
+        })
+
+        
     });
 
     //Test för att ta fram alla bokningar som en användare har
