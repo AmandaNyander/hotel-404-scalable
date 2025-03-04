@@ -8,6 +8,7 @@ spec:
   containers: 
   - name: probe 
     image: docker.io/library/busybox:latest
+    command: ["sh", "-c", "touch /tmp/started && while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK'; sleep 1; done"]
     ports:  
     - containerPort: 7701
     startupProbe: 
@@ -18,14 +19,13 @@ spec:
       periodSeconds: 10 
       failureThreshold: 3
     readinessProbe: 
-      tcpSocket: 
+      tcpSocket:
         port: 7701
       initialDelaySeconds: 5
       periodSeconds: 2
     livenessProbe: 
-      httpGet: 
-        path: /health 
+      httpGet:
+        path: /   # Ändrat från /health till /
         port: 7701 
       initialDelaySeconds: 5
       periodSeconds: 2
-
