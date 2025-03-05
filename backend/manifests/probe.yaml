@@ -1,31 +1,37 @@
 apiVersion: v1
-kind: Pod 
-metadata: 
+kind: Pod
+metadata:
   name: probe
-  labels: 
-    test: probe 
-spec: 
-  containers: 
-  - name: probe 
-    image: docker.io/library/busybox:latest
-    command: ["sh", "-c", "touch /tmp/started && while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK'; sleep 1; done"]
-    ports:  
-    - containerPort: 7701
-    startupProbe: 
-      exec: 
-        command: 
-          - cat 
-          - /tmp/started 
-      periodSeconds: 10 
-      failureThreshold: 3
-    readinessProbe: 
-      tcpSocket:
-        port: 7701
-      initialDelaySeconds: 5
-      periodSeconds: 2
-    livenessProbe: 
-      httpGet:
-        path: /   # Ändrat från /health till /
-        port: 7701 
-      initialDelaySeconds: 5
-      periodSeconds: 2
+spec:
+  containers:
+    - name: probe
+      image: busybox:latest
+      command:
+        - sh
+        - -c
+        - |
+          # 1) Skapa filen /tmp/started så att startupProbe klarar sig
+          touch /tmp/started
+          # 2) Starta en enkel loop som lyssnar på port 7701
+          #    och svarar med en minimal HTTP 200 OK
+          while true; do
+            echo -e "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK" | nc -l -p 7701
+          done
+      ports:
+        - containerPort: 7701
+      startupProbe:
+        exec:
+          command: ["cat", "/tmp/started"]
+        periodSeconds: 10
+        failureThreshold: 20
+      readinessProbe:
+        tcpSocket:
+          port: 7701
+        initialDelaySeconds: 10
+        periodSeconds: 10
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 7701
+        initialDelaySeconds: 10
+        periodSeconds: 10
