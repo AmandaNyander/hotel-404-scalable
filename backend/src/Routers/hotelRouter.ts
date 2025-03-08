@@ -29,7 +29,7 @@ hotelRouter.get("/getHotels", async function(req, res){
 })
 // Route to get hotel details by hotel ID
 hotelRouter.get("/hotelDetails", async (req: Request<{hotelId: string}>, res) => {
-  logging("Getting hotel details"); 
+  logging("Getting hotel details for: "+ req.query.hotelId); 
   try{
     const query = req.query.hotelId ? String(req.query.hotelId) : "";
     const hotel = await getHotelDocumentById(query); 
@@ -42,7 +42,8 @@ hotelRouter.get("/hotelDetails", async (req: Request<{hotelId: string}>, res) =>
       food_img: hotel.food_img, 
       room_img: hotel.room_img
       
-    }; 
+    };
+    console.log(result); 
     res.status(200).send(result); 
   }
   catch{
