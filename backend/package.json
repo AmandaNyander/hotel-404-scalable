@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest",
     "start": "nodemon src/index.ts",
-    "user": "npx tsx ./src/services/Users/index.ts"
+    "user": "npx tsx ./src/services/Users/index.ts",
+    "booking": "npx tsx ./src/services/Bookings/index.ts",
+    "hotel": "npx tsx ./src/services/Hotels/index.ts"
   },
   "keywords": [],
   "author": "",
