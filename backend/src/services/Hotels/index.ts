@@ -39,7 +39,7 @@ export default app;
 
 app.listen(7702, () => {
   logging("Hotel service listening on port 7702");
-})
+});
 
 
 
