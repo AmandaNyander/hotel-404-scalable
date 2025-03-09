@@ -25,6 +25,10 @@ if (process.env.NODE_ENV !== "test") {
     });
 }
 
+app.get("/", (req, res) => {
+  res.status(200).send("Hello world!");
+})
+
 app.use((req, _, next) => {
   logging(`Endpoint: ${req.path}, method: ${req.method}`);
   next();
