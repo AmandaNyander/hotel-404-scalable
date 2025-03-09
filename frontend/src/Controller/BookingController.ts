@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL_BOOKINGS;
 export async function GetBookings() {
     //Kommer göra en API request sen men returnerar statisk data just nu
     const bookings = await axios.get(`${API_URL}`);
+    console.log(API_URL); 
     console.log(bookings.data); 
     return bookings.data; 
 }

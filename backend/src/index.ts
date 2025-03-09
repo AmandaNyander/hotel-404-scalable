@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 import { logging } from "./logging";
 import axios from "axios";
+import proxy from "express-http-proxy"
 
 declare module 'express-session' {
   export interface SessionData {
@@ -63,6 +64,9 @@ app.use(session({
 axios.defaults.withCredentials = true; 
 const mongoURI: string = process.env.DB_CONNECTION_STRING as string;
 
+const userURI = process.env.USER_URI; 
+const hotelURI = process.env.HOTEL_URI; 
+const bookingURI = process.env.BOOKING_URI; 
 
 mongoose.connect(mongoURI)
   .then(() => {
@@ -71,85 +75,30 @@ mongoose.connect(mongoURI)
   .catch(err => {
     logging(`MongoDB connection error: ${err}`);
   });
-
-
-app.use('/api/user', async (req, res) => {
-  try {
-    logging("Path: " + "http://localhost:7701" + req.path);
-    let response;
-    switch (req.method) {
-      case 'POST': 
-        console.log(req.body); 
-        response = await axios.post("http://localhost:7701" + req.path, req.body); 
-        break; 
-      case 'DELETE':
-        response = await axios.delete("http://localhost:7701" + req.path, req.body); 
-        break; 
-      case 'GET': 
-        response = await axios.get("http://localhost:7701" + req.path, { params: req.query}); 
-        break; 
-    }
-    res.json(response.data); 
-  } catch(error) {
-    logging("Failed communication with user API"); 
-    res.status(500).json({error: 'Error communicating with user API'}); 
-  }
-}); 
-
-app.use('/api/hotels', async (req, res) => {
-  try {
-    logging("Path: " + "http://localhost:7702" + req.path);
-    let response;
-    switch (req.method) {
-      case 'POST': 
-        console.log(req.body); 
-        response = await axios.post("http://localhost:7702" + req.path, req.body); 
-        break; 
-      case 'DELETE': 
-        response = await axios.delete("http://localhost:7702" + req.path, req.body); 
-        break; 
-      case 'GET': 
-        response = await axios.get("http://localhost:7702" + req.path, {params: req.query}); 
-        break; 
-    }
-    res.json(response.data); 
-  } catch(error) {
-    logging("Failed communication with hotel API"); 
-    res.status(500).json({error: 'Error communicating with hotel API'}); 
-  }
-});
-app.use('/api/booking', async (req, res) => {
-  try {
-    logging("Path: " + "http://localhost:7703" + req.path);
-    let response;
-    switch (req.method) {
-      case 'POST': 
-        console.log(req.body); 
-        response = await axios.post("http://localhost:7703" + req.path, req.body); 
-        break; 
-      case 'DELETE': 
-        response = await axios.delete("http://localhost:7703" + req.path, req.body); 
-        break; 
-      case 'GET': 
-        response = await axios.get("http://localhost:7703" + req.path, req.body); 
-        break; 
-    }
-    res.json(response.data); 
-  } catch(error) {
-    logging("Failed communication with booking API"); 
-    res.status(500).json({error: 'Error communicating with booking API'}); 
-  }
+app.use((req, _, next) => {
+  logging(`Endpoint: ${req.path}, method: ${req.method}`);
+  next();
 });
 
+
+app.use('/api/user',  (req, res, next) => {
+  logging("Redirecting to user API"); 
+  next(); 
+},proxy(`http://${userURI}`)); 
+
+app.use('/api/hotels', (req, res, next) => {
+  logging("Redirecting to hotel API");
+  next()
+}, proxy(`http://${hotelURI}`));
+app.use('/api/booking', (req, res, next) => {
+  logging("Redirecting to booking API");
+  next(); 
+}, proxy(`http://${bookingURI}`));
 /* Old routing
 app.use("/api/hotels", hotelRouter); 
 app.use("/api/user", userRouter);
 app.use("/api/booking", bookingRouter); 
 */
-app.use((req, _, next) => {
-  logging(`Endpoint: ${req.path}, method: ${req.method}`);
-  next();
-});
 
 
 // Start server

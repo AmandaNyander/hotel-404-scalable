@@ -19,11 +19,13 @@ const Bookings: React.FC = () => {
   //Stores all the bookings
   const [bookingList, SetBookingList] = useState<IBooking[]>([]);
     const bookingsCall = async function(){
-      const bookings = await GetBookings(); 
+      const bookings = await GetBookings();
+      console.log("bookings = ", bookings); 
       SetBookingList(bookings); 
     }
   useEffect(() => {
     bookingsCall(); 
+    console.log(bookingList); 
   }, [])
   //Function that handles cancellation
   const handleCancelation = async (id:string) => {
