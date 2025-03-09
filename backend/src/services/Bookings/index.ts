@@ -11,16 +11,16 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.set("trust proxy",1);
+app.set("trust proxy", 1);
 
-const mongoURI : string = process.env.DB_CONNECTION_STRING as string;
+const mongoURI: string = process.env.DB_CONNECTION_STRING as string;
 
 if (process.env.NODE_ENV !== "test") {
   mongoose.connect(mongoURI)
-  .then(()=> {
+    .then(() => {
       logging('Booking service connected to MongoDB Atlas');
-  })
-  .catch(err => {
+    })
+    .catch(err => {
       logging(`MongoDB connection error: ${err}`);
     });
 }
@@ -30,16 +30,16 @@ app.get("/", (req, res) => {
 })
 
 app.use((req, _, next) => {
-  logging(`Endpoint: ${req.path}, method: ${req.method}`); 
-  next(); 
-}); 
+  logging(`Endpoint: ${req.path}, method: ${req.method}`);
+  next();
+});
 
 app.use("/", bookingRouter)
 
 export default app;
 
 app.listen(7703, () => {
-  logging("Booking service listening on port 7703"); 
+  logging("Booking service listening on port 7703");
 })
 
 

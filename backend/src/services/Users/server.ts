@@ -6,7 +6,6 @@ import session from "express-session";
 import { read } from "fs";
 
 function createServer() {
-  logging("Code updated"); 
   const app = express();
   //Ändrade från ./health till /health för att det ska tolkas som en endpoint
   app.get('/health', (req, res) => {

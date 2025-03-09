@@ -39,7 +39,11 @@ app.use(cors({
   credentials: true
 }));
 // Parse incoming JSON request.
-app.use(express.json());
+app.use((req, res, next) => {
+  console.log(req.body); 
+  next(); 
+},
+express.json());
 
 app.use(cookieParser());
 
@@ -78,11 +82,11 @@ app.use('/api/user', async (req, res) => {
         console.log(req.body); 
         response = await axios.post("http://localhost:7701" + req.path, req.body); 
         break; 
-      case 'DELETE': 
+      case 'DELETE':
         response = await axios.delete("http://localhost:7701" + req.path, req.body); 
         break; 
       case 'GET': 
-        response = await axios.get("http://localhost:7701" + req.path, req.body); 
+        response = await axios.get("http://localhost:7701" + req.path, { params: req.query}); 
         break; 
     }
     res.json(response.data); 
@@ -105,7 +109,7 @@ app.use('/api/hotels', async (req, res) => {
         response = await axios.delete("http://localhost:7702" + req.path, req.body); 
         break; 
       case 'GET': 
-        response = await axios.get("http://localhost:7702" + req.path, req.body); 
+        response = await axios.get("http://localhost:7702" + req.path, {params: req.query}); 
         break; 
     }
     res.json(response.data); 

@@ -33,7 +33,7 @@ hotelRouter.get("/getHotels", async function(req, res){
 
 // Route to get hotel details by hotel ID
 hotelRouter.get("/hotelDetails", async (req: Request<{hotelId: string}>, res) => {
-  logging("Getting hotel details"); 
+  logging("Getting hotel details for:" + req.query.hotelId); 
   try{
     const query = req.query.hotelId ? String(req.query.hotelId) : "";
     const hotel = await getHotelDocumentById(query); 
