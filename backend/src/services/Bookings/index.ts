@@ -38,10 +38,9 @@ app.use("/", bookingRouter)
 
 export default app;
 
-if (require.main === module) {
-  app.listen(7703, () => {
-    logging("Booking service listening on port 7703"); 
-  })
-}
+app.listen(7703, () => {
+  logging("Booking service listening on port 7703"); 
+})
+
 
 

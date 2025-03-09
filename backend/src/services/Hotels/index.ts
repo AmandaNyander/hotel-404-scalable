@@ -37,10 +37,8 @@ app.use("/", hotelRouter);
 
 export default app;
 
-if (require.main === module) {
-    app.listen(7702, () => {
-        logging("User service listening on port 7702"); 
-    })
-}
+app.listen(7702, () => {
+    logging("User service listening on port 7702"); 
+})
 
 

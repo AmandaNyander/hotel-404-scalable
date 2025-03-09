@@ -99,19 +99,19 @@ app.use('/api/hotels', async (req, res) => {
     switch (req.method) {
       case 'POST': 
         console.log(req.body); 
-        response = await axios.post("http://localhost:7701" + req.path, req.body); 
+        response = await axios.post("http://localhost:7702" + req.path, req.body); 
         break; 
       case 'DELETE': 
-        response = await axios.delete("http://localhost:7701" + req.path, req.body); 
+        response = await axios.delete("http://localhost:7702" + req.path, req.body); 
         break; 
       case 'GET': 
-        response = await axios.get("http://localhost:7701" + req.path, req.body); 
+        response = await axios.get("http://localhost:7702" + req.path, req.body); 
         break; 
     }
     res.json(response.data); 
   } catch(error) {
-    logging("Failed communication with user API"); 
-    res.status(500).json({error: 'Error communicating with user API'}); 
+    logging("Failed communication with hotel API"); 
+    res.status(500).json({error: 'Error communicating with hotel API'}); 
   }
 });
 app.use('/api/booking', async (req, res) => {
@@ -121,19 +121,19 @@ app.use('/api/booking', async (req, res) => {
     switch (req.method) {
       case 'POST': 
         console.log(req.body); 
-        response = await axios.post("http://localhost:7701" + req.path, req.body); 
+        response = await axios.post("http://localhost:7703" + req.path, req.body); 
         break; 
       case 'DELETE': 
-        response = await axios.delete("http://localhost:7701" + req.path, req.body); 
+        response = await axios.delete("http://localhost:7703" + req.path, req.body); 
         break; 
       case 'GET': 
-        response = await axios.get("http://localhost:7701" + req.path, req.body); 
+        response = await axios.get("http://localhost:7703" + req.path, req.body); 
         break; 
     }
     res.json(response.data); 
   } catch(error) {
-    logging("Failed communication with user API"); 
-    res.status(500).json({error: 'Error communicating with user API'}); 
+    logging("Failed communication with booking API"); 
+    res.status(500).json({error: 'Error communicating with booking API'}); 
   }
 });
 
