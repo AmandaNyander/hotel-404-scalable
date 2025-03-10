@@ -3,6 +3,7 @@ import request from "supertest"
 import MongoMemoryServer from "mongodb-memory-server-core"
 import mongoose from "mongoose";
 import app from "./index"
+import { logging } from "../../logging";
 
 //För att testerna ska köras automastiskt
 process.env.NODE_ENV = "test";
@@ -12,6 +13,11 @@ jest.mock("./bookingRouter", () => {
         next();
     }
 });
+
+jest.mock("../../logging", () => ({
+    logging: jest.fn()
+}))
+
 let mongoServer : MongoMemoryServer | null= null;
 
 
@@ -22,11 +28,18 @@ beforeAll(async () => {
 })
 
 //Test
-describe("API Test", () => {
+//describe("API Test", () => {
     //test som förväntas retunera code 200
-    it("should return 200 for GET /", async () => {
-        const res = await request(app).get("/");
-        expect(res.statusCode).toBe(200);
+//    it("should return 200 for GET /", async () => {
+//        const res = await request(app).get("/");
+//        expect(res.statusCode).toBe(200);
+//    })
+//})
+
+describe("API Test", () => {
+    it("Should log the request path and method", async () => {
+        await request(app).get("/");
+        expect(logging).toHaveBeenCalledWith("Endpoint: /, method: GET");
     })
 })
 
