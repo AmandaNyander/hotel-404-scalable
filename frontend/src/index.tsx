@@ -42,7 +42,7 @@ const Application: React.FC = () => {
       //If unsuccessful, set loggedIn-state to false. 
 
       try{
-        const session = await axios.get("http://localhost:7700/api/user/session");    
+        const session = await axios.get("http://50.85.47.154:7700/api/user/session");    
         setLoggedin(true); 
       }
       catch {

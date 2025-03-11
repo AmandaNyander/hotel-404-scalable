@@ -1,0 +1,44 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+  namespace: default
+  labels:
+    app: booking-service
+spec:
+  selector:
+    matchLabels:
+      app: booking-service
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container:  booking-service
+      labels:
+        app: booking-service
+    spec:
+      # initContainers:
+        # Init containers are exactly like regular containers, except:
+          # - Init containers always run to completion.
+          # - Each init container must complete successfully before the next one starts.
+      containers:
+      - name: booking-service
+        image: hotel404.azurecr.io/booking-service:1 
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        env: 
+        - name: DB_CONNECTION_STRING
+          valueFrom: 
+            secretKeyRef: 
+              name: constr 
+              key: DB_CONNECTION_STRING
+
+
+       

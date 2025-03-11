@@ -2,29 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: gateway-service
   namespace: default
   labels:
-    app: user-service
+    app: gateway-service
 spec:
   selector:
     matchLabels:
-      app: user-service
+      app: gateway-service
   replicas: 1
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container:  user-service
+        kubectl.kubernetes.io/default-container:  gateway-service
       labels:
-        app: user-service
+        app: gateway-service
     spec:
       # initContainers:
         # Init containers are exactly like regular containers, except:
           # - Init containers always run to completion.
           # - Each init container must complete successfully before the next one starts.
       containers:
-      - name: user-service
-        image: hotel404.azurecr.io/user-service:1 
+      - name: gateway-service
+        image: hotel404.azurecr.io/gateway-service:1 
         imagePullPolicy: Always
         resources:
           requests:
@@ -32,12 +32,20 @@ spec:
             memory: 100Mi
           limits:
             cpu: 200m
-            memory: 200Mi
+            memory: 300Mi
         env: 
         - name: DB_CONNECTION_STRING
           valueFrom: 
             secretKeyRef: 
               name: constr 
               key: DB_CONNECTION_STRING
+        - name: USER_URI
+          value: user-service:7701
+        - name: HOTEL_URI
+          value: hotel-service:7702
+        - name: BOOKING_URI
+          value: booking-service:7703
+
+
 
        
